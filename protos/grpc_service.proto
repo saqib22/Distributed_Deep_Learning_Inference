@@ -21,12 +21,14 @@ option objc_class_prefix = "HLW";
 
 package grpc_service;
 
-// The greeting service definition.
+// The DAMA service definition.
 service DAMA {
 
-  rpc receive_bid (Bid) returns (ServerResponse) {}
+  rpc bid_server (Bid) returns (BiddingResult) {}
 
   rpc get_server_price (Price) returns (Price) {}
+
+  rpc set_layers_assigned (Assignment) returns (ServerResponse) {}
 }
 
 message Bid {
@@ -36,7 +38,7 @@ message Bid {
   float benefit = 4;
 }
 
-message ServerResponse{
+message BiddingResult{
   string server_id = 1;
   bool Ack = 2;
   float price_value = 3;
@@ -47,6 +49,13 @@ message Price{
   float price_value = 1;
 }
 
+message ServerResponse{
+  bool success = 1;
+}
+
+message Assignment {
+  bool layers_assigned = 1;
+}
 
 // Compilation
 // python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=. protos/grpc_service.proto

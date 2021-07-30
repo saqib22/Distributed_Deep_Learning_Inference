@@ -15,15 +15,20 @@ class DAMAStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.receive_bid = channel.unary_unary(
-                '/grpc_service.DAMA/receive_bid',
+        self.bid_server = channel.unary_unary(
+                '/grpc_service.DAMA/bid_server',
                 request_serializer=grpc__service__pb2.Bid.SerializeToString,
-                response_deserializer=grpc__service__pb2.ServerResponse.FromString,
+                response_deserializer=grpc__service__pb2.BiddingResult.FromString,
                 )
         self.get_server_price = channel.unary_unary(
                 '/grpc_service.DAMA/get_server_price',
                 request_serializer=grpc__service__pb2.Price.SerializeToString,
                 response_deserializer=grpc__service__pb2.Price.FromString,
+                )
+        self.set_layers_assigned = channel.unary_unary(
+                '/grpc_service.DAMA/set_layers_assigned',
+                request_serializer=grpc__service__pb2.Assignment.SerializeToString,
+                response_deserializer=grpc__service__pb2.ServerResponse.FromString,
                 )
 
 
@@ -31,7 +36,7 @@ class DAMAServicer(object):
     """The greeting service definition.
     """
 
-    def receive_bid(self, request, context):
+    def bid_server(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -43,18 +48,29 @@ class DAMAServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def set_layers_assigned(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_DAMAServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'receive_bid': grpc.unary_unary_rpc_method_handler(
-                    servicer.receive_bid,
+            'bid_server': grpc.unary_unary_rpc_method_handler(
+                    servicer.bid_server,
                     request_deserializer=grpc__service__pb2.Bid.FromString,
-                    response_serializer=grpc__service__pb2.ServerResponse.SerializeToString,
+                    response_serializer=grpc__service__pb2.BiddingResult.SerializeToString,
             ),
             'get_server_price': grpc.unary_unary_rpc_method_handler(
                     servicer.get_server_price,
                     request_deserializer=grpc__service__pb2.Price.FromString,
                     response_serializer=grpc__service__pb2.Price.SerializeToString,
+            ),
+            'set_layers_assigned': grpc.unary_unary_rpc_method_handler(
+                    servicer.set_layers_assigned,
+                    request_deserializer=grpc__service__pb2.Assignment.FromString,
+                    response_serializer=grpc__service__pb2.ServerResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -68,7 +84,7 @@ class DAMA(object):
     """
 
     @staticmethod
-    def receive_bid(request,
+    def bid_server(request,
             target,
             options=(),
             channel_credentials=None,
@@ -78,9 +94,9 @@ class DAMA(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/grpc_service.DAMA/receive_bid',
+        return grpc.experimental.unary_unary(request, target, '/grpc_service.DAMA/bid_server',
             grpc__service__pb2.Bid.SerializeToString,
-            grpc__service__pb2.ServerResponse.FromString,
+            grpc__service__pb2.BiddingResult.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -98,5 +114,22 @@ class DAMA(object):
         return grpc.experimental.unary_unary(request, target, '/grpc_service.DAMA/get_server_price',
             grpc__service__pb2.Price.SerializeToString,
             grpc__service__pb2.Price.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def set_layers_assigned(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/grpc_service.DAMA/set_layers_assigned',
+            grpc__service__pb2.Assignment.SerializeToString,
+            grpc__service__pb2.ServerResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

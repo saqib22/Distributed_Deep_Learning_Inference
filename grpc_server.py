@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""The Python implementation of the GRPC grpc_service.Greeter server."""
+"""The Python implementation of the GRPC grpc_service.DAMA server."""
 
 from concurrent import futures
 import logging
@@ -35,11 +35,16 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
         self.jk = [] # layers accepted by the server
         self.layer_benefits = {}
         self.epsilon = 5
+        self.all_layers_assigned = False
 
     def get_server_price(self, request, context):
         return grpc_service_pb2.Price(price_value=self.price)
+    
+    def set_layers_assigned(self, request, context):
+        self.all_layers_assigned = request.layers_assigned
+        return grpc_service_pb2.ServerResponse(success=True)
 
-    def receive_bid(self, request, context):
+    def bid_server(self, request, context):
         bid_value = request.bid_value
         if len(self.jk) < self.n_plus:
             self.profit[request.layer] = request.benefit - request.bid_value
@@ -48,7 +53,7 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
             self.price = request.benefit - self.profit[request.layer]
             if len(self.jk) == self.n_plus:
                 self.price = min(list(self.layer_benefits.values()) - list(self.profit.values()))
-            return grpc_service_pb2.ServerResponse(server_id=self.server_id, 
+            return grpc_service_pb2.BiddingResult(server_id=self.server_id, 
                                                    Ack=True, 
                                                    price_value=self.price)
         
@@ -57,7 +62,7 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
             min_gain_layer = list(self.profit.keys())[list(self.profit.values()).index(min_gain_layer_value)]
             self.profit[request.layer] = request.benefit - request.bid_value
             self.price = min_gain_layer_value
-            return grpc_service_pb2.ServerResponse(server_id=self.server_id, 
+            return grpc_service_pb2.BiddingResult(server_id=self.server_id, 
                                                    Ack=True,
                                                    price_value=self.price,
                                                    Nack_layer=min_gain_layer)

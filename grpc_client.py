@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""The Python implementation of the GRPC grpc_service.Greeter client."""
+"""The Python implementation of the GRPC grpc_service.DAMA client."""
 
 from __future__ import print_function
 import logging
@@ -36,12 +36,8 @@ def run():
     stub1 = grpc_service_pb2_grpc.DAMAStub(channel1)
     stub2 = grpc_service_pb2_grpc.DAMAStub(channel2)
 
-    # response = stub.SayHello(grpc_service_pb2.HelloRequest(name='you'))
-    # print("Greeter client received: " + response.message)
-
     I = ['a', 'b', 'c'] # Persons
     A = ['x', 'y'] # Objects
-
 
     S = {} # Assignment vector
     
@@ -76,7 +72,7 @@ def run():
         bid = prices[ji] + vi - wi + epsilon
         print(bid)
 
-        response = stub1.receive_bid(grpc_service_pb2.Bid(bid_value = bid, device_id=device_ID, 
+        response = stub1.bid_server(grpc_service_pb2.Bid(bid_value = bid, device_id=device_ID, 
                                                 benefit=aij[ji], layer=person))
 
         prices[ji] = response.price_value
@@ -86,6 +82,9 @@ def run():
             profits[response.server_id] = aij[ji] - prices[ji]
             print("Offload layer to server")
             print(profits)
+
+        response = stub1.set_layers_assigned(grpc_service_pb2.Assignment(layers_assigned=True))
+        
         break
 
 if __name__ == '__main__':

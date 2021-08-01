@@ -47,7 +47,7 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
         return grpc_service_pb2.Price(price_value=self.price)
     
     def set_layers_assigned(self, request, context):
-        if request.layers_assigned:
+        if len(self.jk) < self.n_minus and request.layers_assigned:
             max_gain_layer_value = max(self.Diff(list(self.layer_benefits.values()), list(self.profit.values())))
             max_gain_layer = list(self.jk.keys())[list(self.jk.values()).index(max_gain_layer_value)]
             second_max_layer_value = self.second_best(self.Diff(list(self.layer_benefits.values()), list(self.profit.values())))

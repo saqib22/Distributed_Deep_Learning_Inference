@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'\n\035io.grpc.examples.grpc_serviceB\020GRPCServiceProtoP\001\242\002\003HLW',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12grpc_service.proto\x12\x0cgrpc_service\"K\n\x03\x42id\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x11\n\tbid_value\x18\x02 \x01(\x02\x12\r\n\x05layer\x18\x03 \x01(\t\x12\x0f\n\x07\x62\x65nefit\x18\x04 \x01(\x02\"X\n\rBiddingResult\x12\x11\n\tserver_id\x18\x01 \x01(\t\x12\x0b\n\x03\x41\x63k\x18\x02 \x01(\x08\x12\x13\n\x0bprice_value\x18\x03 \x01(\x02\x12\x12\n\nNack_layer\x18\x04 \x01(\t\"\x1c\n\x05Price\x12\x13\n\x0bprice_value\x18\x01 \x01(\x02\"!\n\x0eServerResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"%\n\nAssignment\x12\x17\n\x0flayers_assigned\x18\x01 \x01(\x08\x32\xd7\x01\n\x04\x44\x41MA\x12>\n\nbid_server\x12\x11.grpc_service.Bid\x1a\x1b.grpc_service.BiddingResult\"\x00\x12>\n\x10get_server_price\x12\x13.grpc_service.Price\x1a\x13.grpc_service.Price\"\x00\x12O\n\x13set_layers_assigned\x12\x18.grpc_service.Assignment\x1a\x1c.grpc_service.ServerResponse\"\x00\x42\x39\n\x1dio.grpc.examples.grpc_serviceB\x10GRPCServiceProtoP\x01\xa2\x02\x03HLWb\x06proto3'
+  serialized_pb=b'\n\x12grpc_service.proto\x12\x0cgrpc_service\"K\n\x03\x42id\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x11\n\tbid_value\x18\x02 \x01(\x02\x12\r\n\x05layer\x18\x03 \x01(\t\x12\x0f\n\x07\x62\x65nefit\x18\x04 \x01(\x02\"X\n\rBiddingResult\x12\x11\n\tserver_id\x18\x01 \x01(\t\x12\x0b\n\x03\x41\x63k\x18\x02 \x01(\x08\x12\x13\n\x0bprice_value\x18\x03 \x01(\x02\x12\x12\n\nNack_layer\x18\x04 \x01(\t\"\x1c\n\x05Price\x12\x13\n\x0bprice_value\x18\x01 \x01(\x02\"!\n\x0eServerResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"%\n\nAssignment\x12\x17\n\x0flayers_assigned\x18\x01 \x01(\x08\x32\xcc\x01\n\x04\x44\x41MA\x12>\n\nbid_server\x12\x11.grpc_service.Bid\x1a\x1b.grpc_service.BiddingResult\"\x00\x12>\n\x10get_server_price\x12\x13.grpc_service.Price\x1a\x13.grpc_service.Price\"\x00\x12\x44\n\x13set_layers_assigned\x12\x18.grpc_service.Assignment\x1a\x11.grpc_service.Bid\"\x00\x42\x39\n\x1dio.grpc.examples.grpc_serviceB\x10GRPCServiceProtoP\x01\xa2\x02\x03HLWb\x06proto3'
 )
 
 
@@ -279,7 +279,7 @@ _DAMA = _descriptor.ServiceDescriptor(
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=308,
-  serialized_end=523,
+  serialized_end=512,
   methods=[
   _descriptor.MethodDescriptor(
     name='bid_server',
@@ -307,7 +307,7 @@ _DAMA = _descriptor.ServiceDescriptor(
     index=2,
     containing_service=None,
     input_type=_ASSIGNMENT,
-    output_type=_SERVERRESPONSE,
+    output_type=_BID,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

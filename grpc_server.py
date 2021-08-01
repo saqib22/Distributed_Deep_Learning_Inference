@@ -32,34 +32,50 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
         self.profit = {}
         self.n_plus = 4 # upper bound on the number of layers
         self.n_minus = 2 # lower bound on the number of layers
-        self.jk = [] # layers accepted by the server
+        self.jk = {} # layers accepted by the server with their gains = benefit - profit
         self.layer_benefits = {}
         self.epsilon = 5
         self.all_layers_assigned = False
+
+    def Diff(self, li1, li2):
+        return list(np.array(li1) - np.array(li2))
+
+    def second_best(self, li):
+        return np.sort(li)[-1] if len(li) == 1 else np.sort(li)[-2]
 
     def get_server_price(self, request, context):
         return grpc_service_pb2.Price(price_value=self.price)
     
     def set_layers_assigned(self, request, context):
-        self.all_layers_assigned = request.layers_assigned
-        return grpc_service_pb2.ServerResponse(success=True)
+        if request.layers_assigned:
+            max_gain_layer_value = max(self.Diff(list(self.layer_benefits.values()), list(self.profit.values())))
+            max_gain_layer = list(self.jk.keys())[list(self.jk.values()).index(max_gain_layer_value)]
+            second_max_layer_value = self.second_best(self.Diff(list(self.layer_benefits.values()), list(self.profit.values())))
+            second_max_layer = list(self.jk.keys())[list(self.jk.values()).index(max_gain_layer_value)]
+            server_bid = self.profit[max_gain_layer] + max_gain_layer_value - second_max_layer_value + self.epsilon
+            
+            return grpc_service_pb2.Bid(
+                device_id = self.server_id,
+                bid_value = server_bid,
+                layer = max_gain_layer,
+                benefit = self.layer_benefits[max_gain_layer])
 
     def bid_server(self, request, context):
         bid_value = request.bid_value
         if len(self.jk) < self.n_plus:
             self.profit[request.layer] = request.benefit - request.bid_value
-            self.jk.append(request.layer)
+            self.jk[request.layer] = request.benefit - self.profit[request.layer]
             self.layer_benefits[request.layer] = request.benefit
             self.price = request.benefit - self.profit[request.layer]
             if len(self.jk) == self.n_plus:
-                self.price = min(list(self.layer_benefits.values()) - list(self.profit.values()))
+                self.price = min(self.Diff(list(self.layer_benefits.values()) - list(self.profit.values())))
             return grpc_service_pb2.BiddingResult(server_id=self.server_id, 
                                                    Ack=True, 
                                                    price_value=self.price)
         
         elif request.bid_value >= self.price + self.epsilon:
-            min_gain_layer_value = min(list(self.layer_benefits.values()) - list(self.profit.values()))
-            min_gain_layer = list(self.profit.keys())[list(self.profit.values()).index(min_gain_layer_value)]
+            min_gain_layer_value = min(self.Diff(list(self.layer_benefits.values()) - list(self.profit.values())))
+            min_gain_layer = list(self.jk.keys())[list(self.jk.values()).index(min_gain_layer_value)]
             self.profit[request.layer] = request.benefit - request.bid_value
             self.price = min_gain_layer_value
             return grpc_service_pb2.BiddingResult(server_id=self.server_id, 

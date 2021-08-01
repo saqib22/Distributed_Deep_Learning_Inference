@@ -84,7 +84,8 @@ def run():
             print(profits)
 
         response = stub1.set_layers_assigned(grpc_service_pb2.Assignment(layers_assigned=True))
-        
+        print("Discounting for layers starts")
+        print(response)
         break
 
 if __name__ == '__main__':

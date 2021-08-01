@@ -28,7 +28,7 @@ service DAMA {
 
   rpc get_server_price (Price) returns (Price) {}
 
-  rpc set_layers_assigned (Assignment) returns (ServerResponse) {}
+  rpc set_layers_assigned (Assignment) returns (Bid) {}
 }
 
 message Bid {

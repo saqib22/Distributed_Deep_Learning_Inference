@@ -6,7 +6,7 @@ import grpc_service_pb2 as grpc__service__pb2
 
 
 class DAMAStub(object):
-    """The greeting service definition.
+    """The DAMA service definition.
     """
 
     def __init__(self, channel):
@@ -28,12 +28,12 @@ class DAMAStub(object):
         self.set_layers_assigned = channel.unary_unary(
                 '/grpc_service.DAMA/set_layers_assigned',
                 request_serializer=grpc__service__pb2.Assignment.SerializeToString,
-                response_deserializer=grpc__service__pb2.ServerResponse.FromString,
+                response_deserializer=grpc__service__pb2.Bid.FromString,
                 )
 
 
 class DAMAServicer(object):
-    """The greeting service definition.
+    """The DAMA service definition.
     """
 
     def bid_server(self, request, context):
@@ -70,7 +70,7 @@ def add_DAMAServicer_to_server(servicer, server):
             'set_layers_assigned': grpc.unary_unary_rpc_method_handler(
                     servicer.set_layers_assigned,
                     request_deserializer=grpc__service__pb2.Assignment.FromString,
-                    response_serializer=grpc__service__pb2.ServerResponse.SerializeToString,
+                    response_serializer=grpc__service__pb2.Bid.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -80,7 +80,7 @@ def add_DAMAServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class DAMA(object):
-    """The greeting service definition.
+    """The DAMA service definition.
     """
 
     @staticmethod
@@ -130,6 +130,6 @@ class DAMA(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/grpc_service.DAMA/set_layers_assigned',
             grpc__service__pb2.Assignment.SerializeToString,
-            grpc__service__pb2.ServerResponse.FromString,
+            grpc__service__pb2.Bid.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

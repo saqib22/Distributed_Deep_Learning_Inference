@@ -26,7 +26,9 @@ service DAMA {
 
   rpc bid_server (Bid) returns (BiddingResult) {}
 
-  rpc get_server_price (Price) returns (Price) {}
+  rpc get_server_price (Connection) returns (Price) {}
+
+  rpc get_server_id (Connection) returns (ServerID) {}
 
   rpc set_layers_assigned (Assignment) returns (Bid) {}
 }
@@ -49,12 +51,20 @@ message Price{
   float price_value = 1;
 }
 
+message ServerID{
+  string server_id = 1;
+}
+
 message ServerResponse{
   bool success = 1;
 }
 
 message Assignment {
   bool layers_assigned = 1;
+}
+
+message Connection{
+  string msg = 1;
 }
 
 // Compilation

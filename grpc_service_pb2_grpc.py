@@ -22,8 +22,13 @@ class DAMAStub(object):
                 )
         self.get_server_price = channel.unary_unary(
                 '/grpc_service.DAMA/get_server_price',
-                request_serializer=grpc__service__pb2.Price.SerializeToString,
+                request_serializer=grpc__service__pb2.Connection.SerializeToString,
                 response_deserializer=grpc__service__pb2.Price.FromString,
+                )
+        self.get_server_id = channel.unary_unary(
+                '/grpc_service.DAMA/get_server_id',
+                request_serializer=grpc__service__pb2.Connection.SerializeToString,
+                response_deserializer=grpc__service__pb2.ServerID.FromString,
                 )
         self.set_layers_assigned = channel.unary_unary(
                 '/grpc_service.DAMA/set_layers_assigned',
@@ -48,6 +53,12 @@ class DAMAServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def get_server_id(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def set_layers_assigned(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -64,8 +75,13 @@ def add_DAMAServicer_to_server(servicer, server):
             ),
             'get_server_price': grpc.unary_unary_rpc_method_handler(
                     servicer.get_server_price,
-                    request_deserializer=grpc__service__pb2.Price.FromString,
+                    request_deserializer=grpc__service__pb2.Connection.FromString,
                     response_serializer=grpc__service__pb2.Price.SerializeToString,
+            ),
+            'get_server_id': grpc.unary_unary_rpc_method_handler(
+                    servicer.get_server_id,
+                    request_deserializer=grpc__service__pb2.Connection.FromString,
+                    response_serializer=grpc__service__pb2.ServerID.SerializeToString,
             ),
             'set_layers_assigned': grpc.unary_unary_rpc_method_handler(
                     servicer.set_layers_assigned,
@@ -112,8 +128,25 @@ class DAMA(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/grpc_service.DAMA/get_server_price',
-            grpc__service__pb2.Price.SerializeToString,
+            grpc__service__pb2.Connection.SerializeToString,
             grpc__service__pb2.Price.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def get_server_id(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/grpc_service.DAMA/get_server_id',
+            grpc__service__pb2.Connection.SerializeToString,
+            grpc__service__pb2.ServerID.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'\n\035io.grpc.examples.grpc_serviceB\020GRPCServiceProtoP\001\242\002\003HLW',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12grpc_service.proto\x12\x0cgrpc_service\"K\n\x03\x42id\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x11\n\tbid_value\x18\x02 \x01(\x02\x12\r\n\x05layer\x18\x03 \x01(\t\x12\x0f\n\x07\x62\x65nefit\x18\x04 \x01(\x02\"X\n\rBiddingResult\x12\x11\n\tserver_id\x18\x01 \x01(\t\x12\x0b\n\x03\x41\x63k\x18\x02 \x01(\x08\x12\x13\n\x0bprice_value\x18\x03 \x01(\x02\x12\x12\n\nNack_layer\x18\x04 \x01(\t\"\x1c\n\x05Price\x12\x13\n\x0bprice_value\x18\x01 \x01(\x02\"!\n\x0eServerResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"%\n\nAssignment\x12\x17\n\x0flayers_assigned\x18\x01 \x01(\x08\x32\xcc\x01\n\x04\x44\x41MA\x12>\n\nbid_server\x12\x11.grpc_service.Bid\x1a\x1b.grpc_service.BiddingResult\"\x00\x12>\n\x10get_server_price\x12\x13.grpc_service.Price\x1a\x13.grpc_service.Price\"\x00\x12\x44\n\x13set_layers_assigned\x12\x18.grpc_service.Assignment\x1a\x11.grpc_service.Bid\"\x00\x42\x39\n\x1dio.grpc.examples.grpc_serviceB\x10GRPCServiceProtoP\x01\xa2\x02\x03HLWb\x06proto3'
+  serialized_pb=b'\n\x12grpc_service.proto\x12\x0cgrpc_service\"K\n\x03\x42id\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x11\n\tbid_value\x18\x02 \x01(\x02\x12\r\n\x05layer\x18\x03 \x01(\t\x12\x0f\n\x07\x62\x65nefit\x18\x04 \x01(\x02\"X\n\rBiddingResult\x12\x11\n\tserver_id\x18\x01 \x01(\t\x12\x0b\n\x03\x41\x63k\x18\x02 \x01(\x08\x12\x13\n\x0bprice_value\x18\x03 \x01(\x02\x12\x12\n\nNack_layer\x18\x04 \x01(\t\"\x1c\n\x05Price\x12\x13\n\x0bprice_value\x18\x01 \x01(\x02\"\x1d\n\x08ServerID\x12\x11\n\tserver_id\x18\x01 \x01(\t\"!\n\x0eServerResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"%\n\nAssignment\x12\x17\n\x0flayers_assigned\x18\x01 \x01(\x08\"\x19\n\nConnection\x12\x0b\n\x03msg\x18\x01 \x01(\t2\x96\x02\n\x04\x44\x41MA\x12>\n\nbid_server\x12\x11.grpc_service.Bid\x1a\x1b.grpc_service.BiddingResult\"\x00\x12\x43\n\x10get_server_price\x12\x18.grpc_service.Connection\x1a\x13.grpc_service.Price\"\x00\x12\x43\n\rget_server_id\x12\x18.grpc_service.Connection\x1a\x16.grpc_service.ServerID\"\x00\x12\x44\n\x13set_layers_assigned\x12\x18.grpc_service.Assignment\x1a\x11.grpc_service.Bid\"\x00\x42\x39\n\x1dio.grpc.examples.grpc_serviceB\x10GRPCServiceProtoP\x01\xa2\x02\x03HLWb\x06proto3'
 )
 
 
@@ -163,6 +163,38 @@ _PRICE = _descriptor.Descriptor(
 )
 
 
+_SERVERID = _descriptor.Descriptor(
+  name='ServerID',
+  full_name='grpc_service.ServerID',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='server_id', full_name='grpc_service.ServerID.server_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=233,
+  serialized_end=262,
+)
+
+
 _SERVERRESPONSE = _descriptor.Descriptor(
   name='ServerResponse',
   full_name='grpc_service.ServerResponse',
@@ -190,8 +222,8 @@ _SERVERRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=233,
-  serialized_end=266,
+  serialized_start=264,
+  serialized_end=297,
 )
 
 
@@ -222,15 +254,49 @@ _ASSIGNMENT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=268,
-  serialized_end=305,
+  serialized_start=299,
+  serialized_end=336,
+)
+
+
+_CONNECTION = _descriptor.Descriptor(
+  name='Connection',
+  full_name='grpc_service.Connection',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='msg', full_name='grpc_service.Connection.msg', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=338,
+  serialized_end=363,
 )
 
 DESCRIPTOR.message_types_by_name['Bid'] = _BID
 DESCRIPTOR.message_types_by_name['BiddingResult'] = _BIDDINGRESULT
 DESCRIPTOR.message_types_by_name['Price'] = _PRICE
+DESCRIPTOR.message_types_by_name['ServerID'] = _SERVERID
 DESCRIPTOR.message_types_by_name['ServerResponse'] = _SERVERRESPONSE
 DESCRIPTOR.message_types_by_name['Assignment'] = _ASSIGNMENT
+DESCRIPTOR.message_types_by_name['Connection'] = _CONNECTION
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Bid = _reflection.GeneratedProtocolMessageType('Bid', (_message.Message,), {
@@ -254,6 +320,13 @@ Price = _reflection.GeneratedProtocolMessageType('Price', (_message.Message,), {
   })
 _sym_db.RegisterMessage(Price)
 
+ServerID = _reflection.GeneratedProtocolMessageType('ServerID', (_message.Message,), {
+  'DESCRIPTOR' : _SERVERID,
+  '__module__' : 'grpc_service_pb2'
+  # @@protoc_insertion_point(class_scope:grpc_service.ServerID)
+  })
+_sym_db.RegisterMessage(ServerID)
+
 ServerResponse = _reflection.GeneratedProtocolMessageType('ServerResponse', (_message.Message,), {
   'DESCRIPTOR' : _SERVERRESPONSE,
   '__module__' : 'grpc_service_pb2'
@@ -268,6 +341,13 @@ Assignment = _reflection.GeneratedProtocolMessageType('Assignment', (_message.Me
   })
 _sym_db.RegisterMessage(Assignment)
 
+Connection = _reflection.GeneratedProtocolMessageType('Connection', (_message.Message,), {
+  'DESCRIPTOR' : _CONNECTION,
+  '__module__' : 'grpc_service_pb2'
+  # @@protoc_insertion_point(class_scope:grpc_service.Connection)
+  })
+_sym_db.RegisterMessage(Connection)
+
 
 DESCRIPTOR._options = None
 
@@ -278,8 +358,8 @@ _DAMA = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=308,
-  serialized_end=512,
+  serialized_start=366,
+  serialized_end=644,
   methods=[
   _descriptor.MethodDescriptor(
     name='bid_server',
@@ -296,15 +376,25 @@ _DAMA = _descriptor.ServiceDescriptor(
     full_name='grpc_service.DAMA.get_server_price',
     index=1,
     containing_service=None,
-    input_type=_PRICE,
+    input_type=_CONNECTION,
     output_type=_PRICE,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='get_server_id',
+    full_name='grpc_service.DAMA.get_server_id',
+    index=2,
+    containing_service=None,
+    input_type=_CONNECTION,
+    output_type=_SERVERID,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
     name='set_layers_assigned',
     full_name='grpc_service.DAMA.set_layers_assigned',
-    index=2,
+    index=3,
     containing_service=None,
     input_type=_ASSIGNMENT,
     output_type=_BID,

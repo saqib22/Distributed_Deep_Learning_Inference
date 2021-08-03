@@ -29,6 +29,7 @@ import numpy as np
 class End_Device():
     def __init__(self, device_id, server_addrs) -> None:
         self.device_id = device_id
+        self.server_handles = {}
         self.server_ids = []
         self.stubs = []
         self.profits = {}
@@ -44,14 +45,16 @@ class End_Device():
 
         self.authenticate(server_addrs)
         self.initialize_servers()
-
+        
     def second_best(self, li):
         return np.sort(li)[-1] if len(li) == 1 else np.sort(li)[-2]
 
     def initialize_servers(self):
         for stub in self.stubs:
             self.server_prices.append(stub.get_server_price(grpc_service_pb2.Price()).price_value)
-            self.server_ids.append(stub.get_server_id(grpc_service_pb2.ServerID()).server_id)
+            serverID = stub.get_server_id(grpc_service_pb2.ServerID()).server_id
+            self.server_handles[serverID] = stub
+            self.server_ids.append(serverID)
     
     def authenticate(self, server_addr_list):
         for addr in server_addr_list:
@@ -67,27 +70,27 @@ class End_Device():
             vi = max(aij - self.server_prices)
             wi = self.second_best(aij - self.server_prices)
             
-            print(aij - self.prices)
+            print(aij - self.server_prices)
             
             # Calculate the bid for that object
-            bid = self.prices[ji] + vi - wi + self.epsilon
+            bid = self.server_prices[ji] + vi - wi + self.epsilon
             print(bid)
 
-            response = stub1.bid_server(grpc_service_pb2.Bid(bid_value = bid, device_id=device_ID, 
-                                                    benefit=aij[ji], layer=person))
+            response = self.server_handles[self.server_ids[ji]].bid_server(grpc_service_pb2.Bid(bid_value = bid, device_id=self.device_id, 
+                                                    benefit=aij[ji], layer=layer))
 
-            prices[ji] = response.price_value
+            self.server_prices[ji] = response.price_value
             print("Server Response: ", response)
             
             if response.Ack == True:
-                profits[response.server_id] = aij[ji] - prices[ji]
+                self.profits[response.server_id] = aij[ji] - self.server_prices[ji]
                 print("Offload layer to server")
-                print(profits)
+                print(self.profits)
 
-            response = stub1.set_layers_assigned(grpc_service_pb2.Assignment(layers_assigned=True))
-            print("Discounting for layers starts")
-            print(response)
-            break
+            # response = stub1.set_layers_assigned(grpc_service_pb2.Assignment(layers_assigned=True))
+            # print("Discounting for layers starts")
+            # print(response)
+            # break
 
 def run():
     # NOTE(gRPC Python Team): .close() is possible on a channel and should be
@@ -155,3 +158,4 @@ if __name__ == '__main__':
     #run()
 
     device = End_Device("Client:1", ['localhost:50051', 'localhost:50052'])
+    device.start_bidding()

@@ -30,7 +30,9 @@ service DAMA {
 
   rpc get_server_id (Connection) returns (ServerID) {}
 
-  rpc set_layers_assigned (Assignment) returns (Bid) {}
+  rpc set_layers_assigned (Assignment) returns (ServerResponse) {}
+
+  rpc start_discounting (Connection) returns (Bid) {}
 }
 
 message Bid {
@@ -61,6 +63,9 @@ message ServerResponse{
 
 message Assignment {
   bool layers_assigned = 1;
+  string layer_profits = 2;
+  string layer_benefits = 3;
+  string device_id=4;
 }
 
 message Connection{

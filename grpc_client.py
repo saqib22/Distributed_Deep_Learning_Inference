@@ -20,6 +20,8 @@ from os import device_encoding
 from google.protobuf.descriptor import ServiceDescriptor
 
 import grpc
+import json
+from threading import Thread, Lock
 
 import grpc_service_pb2
 import grpc_service_pb2_grpc
@@ -37,15 +39,28 @@ class End_Device():
         self.assignment_vector = {}
         self.epsilon = 5
         self.benefit = {
-            "a": np.array([23, 29]),
-            "b": np.array([15,30]),
-            "c": np.array([20,5])
+            "a": {
+                "Server:50051": 23,
+                "Server:50052": 29
+            },
+            "b": {
+                "Server:50051": 15,
+                "Server:50052": 30
+            },
+            "c": {
+                "Server:50051": 20,
+                "Server:50052": 5
+            }
+            
         }
         self.layers = ['a','b','c']
 
         self.authenticate(server_addrs)
         self.initialize_servers()
-        
+    
+    def Diff(self, li1, li2):
+        return (np.array(li1) - np.array(li2)).tolist()
+
     def second_best(self, li):
         return np.sort(li)[-1] if len(li) == 1 else np.sort(li)[-2]
 
@@ -60,17 +75,19 @@ class End_Device():
         for addr in server_addr_list:
             channel = grpc.insecure_channel(addr)
             self.stubs.append(grpc_service_pb2_grpc.DAMAStub(channel))
-
+    
     def start_bidding(self):
         for layer in self.layers:
-            aij = self.benefit[layer]
+            aij = list(self.benefit[layer].values())
+            print(aij)
             
             # Find the best object having maximum gain
-            ji = np.argmax(aij - self.server_prices)
-            vi = max(aij - self.server_prices)
-            wi = self.second_best(aij - self.server_prices)
+            gain = self.Diff(aij, self.server_prices)
+            ji = gain.index(max(gain))
+            vi = max(gain)
+            wi = self.second_best(gain)
             
-            print(aij - self.server_prices)
+            print(gain)
             
             # Calculate the bid for that object
             bid = self.server_prices[ji] + vi - wi + self.epsilon
@@ -83,15 +100,30 @@ class End_Device():
             print("Server Response: ", response)
             
             if response.Ack == True:
-                self.profits[response.server_id] = aij[ji] - self.server_prices[ji]
+                self.profits[layer] = aij[ji] - self.server_prices[ji]
                 print("Offload layer to server")
                 print(self.profits)
 
-            # response = stub1.set_layers_assigned(grpc_service_pb2.Assignment(layers_assigned=True))
-            # print("Discounting for layers starts")
-            # print(response)
-            # break
+        for server in self.server_ids:
+            response = self.server_handles[server].set_layers_assigned(grpc_service_pb2.Assignment(layers_assigned=True,
+                                                                layer_profits = json.dumps(self.profits),
+                                                                layer_benefits = json.dumps(self.benefit),
+                                                                device_id = self.device_id
+                                                                ))
+            if response: continue 
+            else: raise Exception ("Server response for layer assignment boolean was negative!!!")
+        
+        print("Discounting for layers starts")
+        self.mutex = Lock()
+        for server in self.server_ids:
+            t = Thread(target=self.discount, args=(server,))
+            t.start()
+            t.join()
 
+    def discount(self, server_id):
+        response = self.server_handles[server_id].start_discounting(grpc_service_pb2.Connection())
+        print(response)
+        
 def run():
     # NOTE(gRPC Python Team): .close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs

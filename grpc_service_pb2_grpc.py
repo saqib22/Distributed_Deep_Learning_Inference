@@ -33,6 +33,11 @@ class DAMAStub(object):
         self.set_layers_assigned = channel.unary_unary(
                 '/grpc_service.DAMA/set_layers_assigned',
                 request_serializer=grpc__service__pb2.Assignment.SerializeToString,
+                response_deserializer=grpc__service__pb2.ServerResponse.FromString,
+                )
+        self.start_discounting = channel.unary_unary(
+                '/grpc_service.DAMA/start_discounting',
+                request_serializer=grpc__service__pb2.Connection.SerializeToString,
                 response_deserializer=grpc__service__pb2.Bid.FromString,
                 )
 
@@ -65,6 +70,12 @@ class DAMAServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def start_discounting(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_DAMAServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -86,6 +97,11 @@ def add_DAMAServicer_to_server(servicer, server):
             'set_layers_assigned': grpc.unary_unary_rpc_method_handler(
                     servicer.set_layers_assigned,
                     request_deserializer=grpc__service__pb2.Assignment.FromString,
+                    response_serializer=grpc__service__pb2.ServerResponse.SerializeToString,
+            ),
+            'start_discounting': grpc.unary_unary_rpc_method_handler(
+                    servicer.start_discounting,
+                    request_deserializer=grpc__service__pb2.Connection.FromString,
                     response_serializer=grpc__service__pb2.Bid.SerializeToString,
             ),
     }
@@ -163,6 +179,23 @@ class DAMA(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/grpc_service.DAMA/set_layers_assigned',
             grpc__service__pb2.Assignment.SerializeToString,
+            grpc__service__pb2.ServerResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def start_discounting(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/grpc_service.DAMA/start_discounting',
+            grpc__service__pb2.Connection.SerializeToString,
             grpc__service__pb2.Bid.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

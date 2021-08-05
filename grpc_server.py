@@ -17,6 +17,7 @@ from concurrent import futures
 import logging
 
 import grpc
+import json
 
 import grpc_service_pb2
 import grpc_service_pb2_grpc
@@ -48,20 +49,33 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
     
     def get_server_id(self, request, context):
         return grpc_service_pb2.ServerID(server_id = self.server_id)
-    
+
+    def start_discounting(self, request, context):
+        # if len(self.jk) < self.n_minus:
+        max_gain_layer_value = max(self.Diff(list(self.all_layers_benefits.values()), list(self.all_layers_profits.values())))
+        max_gain_layer = list(self.all_layers.keys())[list(self.all_layers.values()).index(max_gain_layer_value)]
+        second_max_layer_value = self.second_best(self.Diff(list(self.all_layers_benefits.values()), list(self.all_layers_profits.values())))
+        server_bid = self.all_layers_profits[max_gain_layer] + max_gain_layer_value - second_max_layer_value + self.epsilon
+        return grpc_service_pb2.Bid(
+            device_id = self.server_id,
+            bid_value = server_bid,
+            layer = max_gain_layer,
+            benefit = self.all_layers_benefits[max_gain_layer])
+
     def set_layers_assigned(self, request, context):
-        if len(self.jk) < self.n_minus and request.layers_assigned:
-            max_gain_layer_value = max(self.Diff(list(self.layer_benefits.values()), list(self.profit.values())))
-            max_gain_layer = list(self.jk.keys())[list(self.jk.values()).index(max_gain_layer_value)]
-            second_max_layer_value = self.second_best(self.Diff(list(self.layer_benefits.values()), list(self.profit.values())))
-            second_max_layer = list(self.jk.keys())[list(self.jk.values()).index(max_gain_layer_value)]
-            server_bid = self.profit[max_gain_layer] + max_gain_layer_value - second_max_layer_value + self.epsilon
-            
-            return grpc_service_pb2.Bid(
-                device_id = self.server_id,
-                bid_value = server_bid,
-                layer = max_gain_layer,
-                benefit = self.layer_benefits[max_gain_layer])
+        if request.layers_assigned == True:
+            self.all_layers_profits = json.loads(request.layer_profits)
+            benefits_json = json.loads(request.layer_benefits)
+            self.all_layers = {}
+            self.all_layers_benefits = {}
+            for i, (key, value) in enumerate(benefits_json.items()):
+                self.all_layers[key] = value[self.server_id] - self.all_layers_profits[key]
+                self.all_layers_benefits[key] = value[self.server_id]
+            print(self.all_layers)
+            print("*************** " + self.server_id + "***************")
+            print("All layers assigned for the device " + request.device_id)
+            print("Layers associated with this device are" +str(self.jk) +"\n\n")
+            return grpc_service_pb2.ServerResponse(success=True)
 
     def bid_server(self, request, context):
         bid_value = request.bid_value

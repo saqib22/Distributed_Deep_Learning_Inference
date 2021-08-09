@@ -33,6 +33,12 @@ service DAMA {
   rpc set_layers_assigned (Assignment) returns (ServerResponse) {}
 
   rpc start_discounting (Connection) returns (Bid) {}
+
+  rpc ack_layer (AddDropLayer) returns (ServerResponse) {}
+
+  rpc return_layer (AddDropLayer) returns (ServerResponse) {}
+
+  rpc nack_layer (AddDropLayer) returns (ServerResponse) {}
 }
 
 message Bid {
@@ -40,6 +46,7 @@ message Bid {
   float bid_value = 2;
   string layer = 3;
   float benefit = 4;
+  bool success = 5;
 }
 
 message BiddingResult{
@@ -70,6 +77,12 @@ message Assignment {
 
 message Connection{
   string msg = 1;
+}
+
+message AddDropLayer {
+  string layer = 1;
+  float profit = 2;
+  float benefit = 3;
 }
 
 // Compilation

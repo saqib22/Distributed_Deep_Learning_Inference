@@ -101,6 +101,7 @@ class End_Device():
             
             if response.Ack == True:
                 self.profits[layer] = aij[ji] - self.server_prices[ji]
+                self.assignment_vector[layer] = self.server_ids[ji]
                 print("Offload layer to server")
                 print(self.profits)
 
@@ -114,15 +115,36 @@ class End_Device():
             else: raise Exception ("Server response for layer assignment boolean was negative!!!")
         
         print("Discounting for layers starts")
+        print("Current assignment of layers!")
+        print(self.assignment_vector)
+
         self.mutex = Lock()
         for server in self.server_ids:
             t = Thread(target=self.discount, args=(server,))
             t.start()
             t.join()
+        
+        print("Assignment after discounts for layers")
+        print(self.assignment_vector)
 
     def discount(self, server_id):
         response = self.server_handles[server_id].start_discounting(grpc_service_pb2.Connection())
-        print(response)
+        if response.success == False:
+            print("The server " + server_id +  " has already reached the minimum assignment nkminus!!")
+            return
+
+        self.mutex.acquire()
+
+        if (response.bid_value - self.profits[response.layer]) >= self.epsilon:
+            self.profits[response.layer] = response.bid_value
+            self.assignment_vector[response.layer] = server_id
+
+            r1 = self.server_handles[self.assignment_vector[response.layer]].return_layer(grpc_service_pb2.AddDropLayer(layer=response.layer, profit=response.bid_value))
+            r2 = self.server_handles[server_id].ack_layer(grpc_service_pb2.AddDropLayer(layer=response.layer, profit=response.bid_value, benefit=self.benefit[response.layer][server_id]))
+        else:
+            r3 = self.server_handles[server_id].nack_layer(grpc_service_pb2.AddDropLayer(layer=response.layer, profit=response.bid_value))
+
+        self.mutex.release()
         
 def run():
     # NOTE(gRPC Python Team): .close() is possible on a channel and should be

@@ -42,7 +42,7 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
         return list(np.array(li1) - np.array(li2))
 
     def second_best(self, li):
-        return np.sort(li)[-1] if len(li) == 1 else np.sort(li)[-2]
+        return 0 if len(li) == 1 else np.sort(li)[-2]
 
     def get_server_price(self, request, context):
         return grpc_service_pb2.Price(price_value=self.price)
@@ -55,6 +55,7 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
         del self.profit[request.layer]
         del self.layer_benefits[request.layer]
         self.all_layers_profits[request.layer] = request.profit
+        self.all_layers_benefits[request.layer] = request.benefit
         return grpc_service_pb2.ServerResponse(success=True)
 
     def ack_layer(self, request, context):
@@ -69,7 +70,7 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
     
     def nack_layer(self, request, context):
         self.all_layers_profits[request.layer] = request.profit
-
+        self.all_layers_benefits[request.layer] = request.benefit
         return grpc_service_pb2.ServerResponse(success=True)
 
     def start_discounting(self, request, context):
@@ -96,10 +97,15 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
             for i, (key, value) in enumerate(benefits_json.items()):
                 self.all_layers[key] = value[self.server_id] - self.all_layers_profits[key]
                 self.all_layers_benefits[key] = value[self.server_id]
-            print(self.all_layers)
+            #Remove all the layers already offloaded to this server
+            for key, item in self.jk.items():
+                del self.all_layers_profits[key]
+                del self.all_layers_benefits[key]
+                del self.all_layers[key]
+            
             print("*************** " + self.server_id + "***************")
             print("All layers assigned for the device " + request.device_id)
-            print("Layers associated with this device are" +str(self.jk) +"\n\n")
+            print("Layers associated with this device (before discounting) are " +str(self.jk) +"\n\n")
             return grpc_service_pb2.ServerResponse(success=True)
 
     def bid_server(self, request, context):
@@ -107,7 +113,7 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
             self.profit[request.layer] = request.benefit - request.bid_value
             self.jk[request.layer] = request.benefit - self.profit[request.layer]
             self.layer_benefits[request.layer] = request.benefit
-            self.price = request.benefit - self.profit[request.layer]
+            # self.price = request.benefit - self.profit[request.layer]
             if len(self.jk) == self.n_plus:
                 self.price = min(self.Diff(list(self.layer_benefits.values()) - list(self.profit.values())))
             return grpc_service_pb2.BiddingResult(server_id=self.server_id, 

@@ -135,14 +135,19 @@ class End_Device():
 
         self.mutex.acquire()
 
-        if (response.bid_value - self.profits[response.layer]) >= self.epsilon:
-            self.profits[response.layer] = response.bid_value
-            self.assignment_vector[response.layer] = server_id
+        print("discount and bid_value sent by the server " + str(response.bid_value))
 
-            r1 = self.server_handles[self.assignment_vector[response.layer]].return_layer(grpc_service_pb2.AddDropLayer(layer=response.layer, profit=response.bid_value))
+        if (response.bid_value - self.profits[response.layer]) >= self.epsilon:
+            print("Discount offered to " + server_id + " for layer " + response.layer)
+            self.profits[response.layer] = response.bid_value
+            
             r2 = self.server_handles[server_id].ack_layer(grpc_service_pb2.AddDropLayer(layer=response.layer, profit=response.bid_value, benefit=self.benefit[response.layer][server_id]))
+            r1 = self.server_handles[self.assignment_vector[response.layer]].return_layer(grpc_service_pb2.AddDropLayer(layer=response.layer, profit=response.bid_value, benefit=self.benefit[response.layer][server_id]))
+            
+            self.assignment_vector[response.layer] = server_id
         else:
-            r3 = self.server_handles[server_id].nack_layer(grpc_service_pb2.AddDropLayer(layer=response.layer, profit=response.bid_value))
+            print("Discount not offered to " + server_id)
+            r3 = self.server_handles[server_id].nack_layer(grpc_service_pb2.AddDropLayer(layer=response.layer, profit=response.bid_value, benefit=self.benefit[response.layer][server_id]))
 
         self.mutex.release()
         

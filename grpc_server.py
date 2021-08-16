@@ -115,13 +115,13 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
             self.layer_benefits[request.layer] = request.benefit
             # self.price = request.benefit - self.profit[request.layer]
             if len(self.jk) == self.n_plus:
-                self.price = min(self.Diff(list(self.layer_benefits.values()) - list(self.profit.values())))
+                self.price = min(self.Diff(list(self.layer_benefits.values()), list(self.profit.values())))
             return grpc_service_pb2.BiddingResult(server_id=self.server_id, 
                                                    Ack=True, 
                                                    price_value=self.price)
         
         elif request.bid_value >= self.price + self.epsilon:
-            min_gain_layer_value = min(self.Diff(list(self.layer_benefits.values()) - list(self.profit.values())))
+            min_gain_layer_value = min(self.Diff(list(self.layer_benefits.values()), list(self.profit.values())))
             min_gain_layer = list(self.jk.keys())[list(self.jk.values()).index(min_gain_layer_value)]
             self.profit[request.layer] = request.benefit - request.bid_value
             self.price = min_gain_layer_value

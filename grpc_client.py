@@ -27,6 +27,12 @@ import grpc_service_pb2
 import grpc_service_pb2_grpc
 
 import numpy as np
+import torch
+
+import random
+import collections
+
+import model.CNN as nn
 
 class End_Device():
     def __init__(self, device_id, server_addrs) -> None:
@@ -38,23 +44,35 @@ class End_Device():
         self.server_prices = []
         self.assignment_vector = {}
         self.epsilon = 5
-        self.benefit = {
-            "a": {
-                "Server:50051": 23,
-                "Server:50052": 29
-            },
-            "b": {
-                "Server:50051": 15,
-                "Server:50052": 30
-            },
-            "c": {
-                "Server:50051": 20,
-                "Server:50052": 5
-            }
-            
-        }
-        self.layers = ['a','b','c']
-
+        # self.benefit = {
+        #     "a": {
+        #         "Server:50051": 23,
+        #         "Server:50052": 29
+        #     },
+        #     "b": {
+        #         "Server:50051": 15,
+        #         "Server:50052": 30
+        #     },
+        #     "c": {
+        #         "Server:50051": 20,
+        #         "Server:50052": 5
+        #     },
+        #     "d": {
+        #         "Server:50051": 15,
+        #         "Server:50052": 7
+        #     },
+        #     "e": {
+        #         "Server:50051": 11,
+        #         "Server:50052": 9
+        #     },
+        #     "f": {
+        #         "Server:50051": 5,
+        #         "Server:50052": 16
+        #     }
+        # }
+        # self.layers = ['a','b','c', 'd','e','f']
+        self.layers = []
+        self.benefit = collections.defaultdict(dict)
         self.authenticate(server_addrs)
         self.initialize_servers()
     
@@ -150,6 +168,20 @@ class End_Device():
             r3 = self.server_handles[server_id].nack_layer(grpc_service_pb2.AddDropLayer(layer=response.layer, profit=response.bid_value, benefit=self.benefit[response.layer][server_id]))
 
         self.mutex.release()
+    
+    def initialize_task(self, input_data, model):
+        for name, module in model.named_modules():
+            if name == '': continue
+            self.layers.append(name)
+        #Benefit calculation -> for the time being its random
+        for layer in self.layers:
+            for server in self.server_ids:
+                self.benefit[layer][server] = random.randint(1,30)
+        print("**********Benefits***********")
+        print(self.benefit)
+    
+    def inference(self):
+        pass
         
 def run():
     # NOTE(gRPC Python Team): .close() is possible on a channel and should be
@@ -215,6 +247,19 @@ def run():
 if __name__ == '__main__':
     logging.basicConfig()
     #run()
-
+    
     device = End_Device("Client:1", ['localhost:50051', 'localhost:50052'])
+    
+    #Deep Learning task
+    model = nn.CNN(nn.NUM_CLASSES)
+
+    state = torch.load('model/cnn.pth')
+    model.load_state_dict(state)
+
+    input_features, _ = nn.next_batch(train=False)
+
+    device.initialize_task(input_features, model)
+    
     device.start_bidding()
+
+    device.inference()

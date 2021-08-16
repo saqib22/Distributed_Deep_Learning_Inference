@@ -15,7 +15,7 @@ mnist = input_data.read_data_sets("MNIST_data", one_hot=False)
 batch_size = 500   # Number of samples in each batch
 epoch_num = 20      # Number of epochs to train the network
 lr = 0.0005        # Learning rate
-
+NUM_CLASSES=10
 
 def next_batch(train=True):
     # A function to read the next batch of MNIST images and labels
@@ -93,38 +93,40 @@ class CNN(nn.Module):
         acc = 100 * torch.sum(torch.eq(indices.float(), y.float()).float())/y.size()[0]
         return acc.cpu().data[0]
 
-# define the CNN and move the network into GPU
-cnn = CNN(10)
-cnn.cuda()
+if __name__ == "__main__":
+
+    # define the CNN and move the network into GPU
+    cnn = CNN(NUM_CLASSES)
+    cnn.cuda()
 
 
-# calculate the number of batches per epoch
-batch_per_ep = mnist.train.num_examples // batch_size
+    # calculate the number of batches per epoch
+    batch_per_ep = mnist.train.num_examples // batch_size
 
-# define the loss (criterion) and create an optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(cnn.parameters(), lr=lr)
+    # define the loss (criterion) and create an optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(cnn.parameters(), lr=lr)
 
-for ep in range(epoch_num):  # epochs loop
-    for batch_n in range(batch_per_ep):  # batches loop
-        print('epoch: {} - batch: {}/{} \n'.format(ep, batch_n, batch_per_ep))
-        features, labels = next_batch()
+    for ep in range(epoch_num):  # epochs loop
+        for batch_n in range(batch_per_ep):  # batches loop
+            print('epoch: {} - batch: {}/{} \n'.format(ep, batch_n, batch_per_ep))
+            features, labels = next_batch()
 
-        # Reset gradients
-        optimizer.zero_grad()
+            # Reset gradients
+            optimizer.zero_grad()
 
-        # Forward pass
-        # output = cnn(features)
-        output = cnn.predict(features)
-        loss = criterion(output, labels)    # calculate the loss
-        print('loss: ', loss.data)
+            # Forward pass
+            # output = cnn(features)
+            output = cnn.predict(features)
+            loss = criterion(output, labels)    # calculate the loss
+            print('loss: ', loss.data)
 
-        # Backward pass and updates
-        loss.backward()                     # calculate the gradients (backpropagation)
-        optimizer.step()                    # update the weights
+            # Backward pass and updates
+            loss.backward()                     # calculate the gradients (backpropagation)
+            optimizer.step()                    # update the weights
 
-torch.save(cnn.state_dict(), './cnn.pth')
+    torch.save(cnn.state_dict(), './cnn.pth')
 
-# test the accuracy on a batch of test data
-features, labels = next_batch(train=False)
-print('\n \n Test accuracy: ', cnn.accuracy(features, labels))
+    # test the accuracy on a batch of test data
+    features, labels = next_batch(train=False)
+    print('\n \n Test accuracy: ', cnn.accuracy(features, labels))

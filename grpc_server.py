@@ -25,6 +25,8 @@ import grpc_service_pb2_grpc
 import sys
 import numpy as np
 
+import multiprocessing
+
 class DAMA(grpc_service_pb2_grpc.DAMAServicer):
 
     def __init__(self, server_id):
@@ -140,4 +142,7 @@ def serve(port):
 
 if __name__ == '__main__':
     logging.basicConfig()
-    serve(port=sys.argv[1])
+    
+    for i in range(5):
+        p = multiprocessing.Process(target=serve, args=(sys.argv[1],))
+        p.start()

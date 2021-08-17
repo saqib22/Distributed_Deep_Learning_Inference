@@ -88,6 +88,9 @@ class End_Device():
             serverID = stub.get_server_id(grpc_service_pb2.ServerID()).server_id
             self.server_handles[serverID] = stub
             self.server_ids.append(serverID)
+        
+        print("DEBUG")
+        print(self.server_prices)
     
     def authenticate(self, server_addr_list):
         for addr in server_addr_list:
@@ -181,7 +184,7 @@ class End_Device():
         print(self.benefit)
     
     def inference(self):
-        pass
+        print("Start infercing")
         
 def run():
     # NOTE(gRPC Python Team): .close() is possible on a channel and should be

@@ -18,11 +18,13 @@ import logging
 
 import grpc
 import json
+import torch
 
 import grpc_service_pb2
 import grpc_service_pb2_grpc
 
 import sys
+import pickle
 import numpy as np
 
 import multiprocessing
@@ -144,8 +146,16 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
     
     def infer_layer(self, request, context):
         DAG = json.loads(request.DAG)
-        for layer in request.DAG:
-            print(layer)
+        input_features = np.array(json.loads(request.inputs))
+        weights = np.array(json.loads(request.weights))
+        model_layer = pickle.loads(request.model_layer)
+        print("Layer given for inference", model_layer)
+        
+        with torch.no_grad():
+            model_layer.cuda()
+            outputs = model_layer.forward(torch.from_numpy(input_features).cuda().float())
+        
+        return grpc_service_pb2.Preds(output=json.dumps(outputs.cpu().detach().numpy(), cls=NumpyEncoder))
 
 def serve(port):
     options=[

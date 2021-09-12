@@ -88,9 +88,9 @@ message AddDropLayer {
 }
 
 message Features{
-  string weights = 1;
-  string inputs = 2;
-  string DAG = 3;
+  string inputs = 1;
+  string DAG = 2;
+  bytes model_layer = 3;
 }
 
 message Preds{

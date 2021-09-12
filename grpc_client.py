@@ -204,26 +204,20 @@ class End_Device():
         # for i, layer in enumerate(self.layers):
         #     infer_req = {}
         #     if i == 0:
-        infer_req = {}
         layer = self.layers[0]
-        weights = getattr(self.model, layer).weight
-        weights = weights.cpu().detach().numpy()
-        infer_req[layer] = weights
+
+        pytorch_layer = getattr(self.model, layer)
         
-        self.server_handles[self.assignment_vector[layer]].infer_layer(grpc_service_pb2.Features(
-                                                                        weights = json.dumps(weights,  cls=NumpyEncoder),
-                                                                        inputs = json.dumps(self.input_data.cpu().detach().numpy(), cls=NumpyEncoder),
-                                                                        DAG = json.dumps(self.assignment_vector)
-                                                                        ))
-
-        # self.server_handles[self.assignment_vector[layer]].infer_layer(grpc_service_pb2.Features(
-        #                                                                 weights = pickle.dumps(weights,),
-        #                                                                 inputs = pickle.dumps(self.input_data.cpu().detach().numpy()),
-        #                                                                 DAG = pickle.dumps(self.assignment_vector)
-        #                                                                 ))
-
-
+        features = self.server_handles[self.assignment_vector[layer]].infer_layer(
+                                                                grpc_service_pb2.Features(
+                                                                    inputs = json.dumps(self.input_data.cpu().detach().numpy(), cls=NumpyEncoder),
+                                                                    DAG = json.dumps(self.assignment_vector),
+                                                                    model_layer = pickle.dumps(pytorch_layer)
+                                                                ))
         
+        features = np.array(json.loads(features.output))
+        print(features.shape)
+
 def run():
     # NOTE(gRPC Python Team): .close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs

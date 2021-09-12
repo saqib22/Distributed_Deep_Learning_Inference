@@ -21,6 +21,7 @@ from google.protobuf.descriptor import ServiceDescriptor
 
 import grpc
 import json
+import pickle
 from threading import Thread, Lock
 
 import grpc_service_pb2
@@ -28,11 +29,19 @@ import grpc_service_pb2_grpc
 
 import numpy as np
 import torch
+import gzip
 
 import random
 import collections
 
 import model.CNN as nn
+
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
 
 class End_Device():
     def __init__(self, device_id, server_addrs) -> None:
@@ -94,7 +103,11 @@ class End_Device():
     
     def authenticate(self, server_addr_list):
         for addr in server_addr_list:
-            channel = grpc.insecure_channel(addr)
+            options=[
+                 ('grpc.max_send_message_length', 1024*1024*1024),
+                ('grpc.max_receive_message_length', 1024*1024*1024),
+             ]
+            channel = grpc.insecure_channel(addr, options=options)
             self.stubs.append(grpc_service_pb2_grpc.DAMAStub(channel))
     
     def start_bidding(self):
@@ -144,7 +157,7 @@ class End_Device():
             t = Thread(target=self.discount, args=(server,))
             t.start()
             t.join()
-        
+
         print("Assignment after discounts for layers")
         print(self.assignment_vector)
 
@@ -173,18 +186,43 @@ class End_Device():
         self.mutex.release()
     
     def initialize_task(self, input_data, model):
+        self.model = model
+        self.input_data = input_data
         for name, module in model.named_modules():
             if name == '': continue
             self.layers.append(name)
         #Benefit calculation -> for the time being its random
         for layer in self.layers:
             for server in self.server_ids:
-                self.benefit[layer][server] = random.randint(1,30)
+                self.benefit[layer][server] = random.randint(1,20)
         print("**********Benefits***********")
         print(self.benefit)
     
     def inference(self):
-        print("Start infercing")
+        print("Start inferencing")
+
+        # for i, layer in enumerate(self.layers):
+        #     infer_req = {}
+        #     if i == 0:
+        infer_req = {}
+        layer = self.layers[0]
+        weights = getattr(self.model, layer).weight
+        weights = weights.cpu().detach().numpy()
+        infer_req[layer] = weights
+        
+        self.server_handles[self.assignment_vector[layer]].infer_layer(grpc_service_pb2.Features(
+                                                                        weights = json.dumps(weights,  cls=NumpyEncoder),
+                                                                        inputs = json.dumps(self.input_data.cpu().detach().numpy(), cls=NumpyEncoder),
+                                                                        DAG = json.dumps(self.assignment_vector)
+                                                                        ))
+
+        # self.server_handles[self.assignment_vector[layer]].infer_layer(grpc_service_pb2.Features(
+        #                                                                 weights = pickle.dumps(weights,),
+        #                                                                 inputs = pickle.dumps(self.input_data.cpu().detach().numpy()),
+        #                                                                 DAG = pickle.dumps(self.assignment_vector)
+        #                                                                 ))
+
+
         
 def run():
     # NOTE(gRPC Python Team): .close() is possible on a channel and should be

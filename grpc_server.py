@@ -27,6 +27,13 @@ import numpy as np
 
 import multiprocessing
 
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
 class DAMA(grpc_service_pb2_grpc.DAMAServicer):
 
     def __init__(self, server_id):
@@ -40,6 +47,8 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
         self.epsilon = 5
         self.all_layers_assigned = False
 
+        print("Process " + str(multiprocessing.current_process()) + "Initialized !!!")
+
     def Diff(self, li1, li2):
         return list(np.array(li1) - np.array(li2))
 
@@ -47,6 +56,7 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
         return 0 if len(li) == 1 else np.sort(li)[-2]
 
     def get_server_price(self, request, context):
+        print("Current Process: " + str(multiprocessing.current_process()))
         return grpc_service_pb2.Price(price_value=self.price)
     
     def get_server_id(self, request, context):
@@ -131,10 +141,18 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
                                                    Ack=True,
                                                    price_value=self.price,
                                                    Nack_layer=min_gain_layer)
-        
+    
+    def infer_layer(self, request, context):
+        DAG = json.loads(request.DAG)
+        for layer in request.DAG:
+            print(layer)
 
 def serve(port):
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    options=[
+                ('grpc.max_send_message_length', 1024*1024*1024),
+                ('grpc.max_receive_message_length', 1024*1024*1024),
+            ]
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10), options=options)
     grpc_service_pb2_grpc.add_DAMAServicer_to_server(DAMA('Server:' + port), server)
     server.add_insecure_port('[::]:' + port)
     server.start()

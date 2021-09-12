@@ -55,6 +55,11 @@ class DAMAStub(object):
                 request_serializer=grpc__service__pb2.AddDropLayer.SerializeToString,
                 response_deserializer=grpc__service__pb2.ServerResponse.FromString,
                 )
+        self.infer_layer = channel.unary_unary(
+                '/grpc_service.DAMA/infer_layer',
+                request_serializer=grpc__service__pb2.Features.SerializeToString,
+                response_deserializer=grpc__service__pb2.Preds.FromString,
+                )
 
 
 class DAMAServicer(object):
@@ -109,6 +114,12 @@ class DAMAServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def infer_layer(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_DAMAServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -151,6 +162,11 @@ def add_DAMAServicer_to_server(servicer, server):
                     servicer.nack_layer,
                     request_deserializer=grpc__service__pb2.AddDropLayer.FromString,
                     response_serializer=grpc__service__pb2.ServerResponse.SerializeToString,
+            ),
+            'infer_layer': grpc.unary_unary_rpc_method_handler(
+                    servicer.infer_layer,
+                    request_deserializer=grpc__service__pb2.Features.FromString,
+                    response_serializer=grpc__service__pb2.Preds.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -296,5 +312,22 @@ class DAMA(object):
         return grpc.experimental.unary_unary(request, target, '/grpc_service.DAMA/nack_layer',
             grpc__service__pb2.AddDropLayer.SerializeToString,
             grpc__service__pb2.ServerResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def infer_layer(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/grpc_service.DAMA/infer_layer',
+            grpc__service__pb2.Features.SerializeToString,
+            grpc__service__pb2.Preds.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

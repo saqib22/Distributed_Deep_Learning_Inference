@@ -39,6 +39,8 @@ service DAMA {
   rpc return_layer (AddDropLayer) returns (ServerResponse) {}
 
   rpc nack_layer (AddDropLayer) returns (ServerResponse) {}
+
+  rpc infer_layer (Features) returns (Preds) {}
 }
 
 message Bid {
@@ -83,6 +85,16 @@ message AddDropLayer {
   string layer = 1;
   float profit = 2;
   float benefit = 3;
+}
+
+message Features{
+  string weights = 1;
+  string inputs = 2;
+  string DAG = 3;
+}
+
+message Preds{
+  string output = 1;
 }
 
 // Compilation

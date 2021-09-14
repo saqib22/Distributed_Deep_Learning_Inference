@@ -199,25 +199,48 @@ class End_Device():
         print(self.benefit)
     
     def inference(self):
-        print("Start inferencing")
+        print("\nStart inferencing")
 
         # for i, layer in enumerate(self.layers):
         #     infer_req = {}
         #     if i == 0:
-        layer = self.layers[0]
-
-        pytorch_layer = getattr(self.model, layer)
+        infer_req = dict()
+        input_features = self.input_data.cpu().detach().numpy()
+        for i, (layer, server) in enumerate(self.assignment_vector.items()):
+            if i == 0 or server == prev_server:
+                # infer_req[layer] = {layer: pickle.dumps(getattr(self.model, layer))}
+                infer_req[layer] = {layer: getattr(self.model, layer)}
+                prev_server = server
+                continue
+            else:
+                if len(infer_req) != 0:
+                    print("\nInfer req", infer_req.keys())
+                    print("Infer_req", len(infer_req))
+                    print("Server: ", prev_server)
+                    features = self.server_handles[prev_server].infer_layer(grpc_service_pb2.Features(
+                                                                        inputs = json.dumps(input_features, cls=NumpyEncoder),
+                                                                        DAG = pickle.dumps(infer_req),
+                                                                    ))
+                    input_features = np.array(json.loads(features.output)[features.layer])
+                    
+                    infer_req = dict()
+                    infer_req[layer] = {layer: getattr(self.model, layer)}
+                    prev_server = server
+                else:
+                    print("Inference task finished successfully !!")
         
-        features = self.server_handles[self.assignment_vector[layer]].infer_layer(
-                                                                grpc_service_pb2.Features(
-                                                                    inputs = json.dumps(self.input_data.cpu().detach().numpy(), cls=NumpyEncoder),
-                                                                    DAG = json.dumps(self.assignment_vector),
-                                                                    model_layer = pickle.dumps(pytorch_layer)
-                                                                ))
-        
-        features = np.array(json.loads(features.output))
-        print(features.shape)
-
+        #Last Layer
+        if len(infer_req) != 0:
+            print("\nInfer req", infer_req.keys())
+            print("Infer_req", len(infer_req))
+            print("Server: ", prev_server)
+            features = self.server_handles[prev_server].infer_layer(grpc_service_pb2.Features(
+                                                                inputs = json.dumps(input_features, cls=NumpyEncoder),
+                                                                DAG = pickle.dumps(infer_req),
+                                                            ))
+            final_predictions = np.array(json.loads(features.output)[features.layer])
+            print(final_predictions.shape)
+            print(final_predictions)
 def run():
     # NOTE(gRPC Python Team): .close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs

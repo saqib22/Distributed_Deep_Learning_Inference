@@ -145,17 +145,34 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
                                                    Nack_layer=min_gain_layer)
     
     def infer_layer(self, request, context):
-        DAG = json.loads(request.DAG)
+        DAG = pickle.loads(request.DAG)
         input_features = np.array(json.loads(request.inputs))
-        weights = np.array(json.loads(request.weights))
-        model_layer = pickle.loads(request.model_layer)
-        print("Layer given for inference", model_layer)
-        
+        print("Layers given for inference", DAG.keys())
+
         with torch.no_grad():
-            model_layer.cuda()
-            outputs = model_layer.forward(torch.from_numpy(input_features).cuda().float())
-        
-        return grpc_service_pb2.Preds(output=json.dumps(outputs.cpu().detach().numpy(), cls=NumpyEncoder))
+            for layer, model_layer in DAG.items():
+                model_layer[layer].cuda()
+                
+                if type(input_features) == np.ndarray:
+                    print("Layer: ", layer)
+                    print("Input: ", input_features.shape)
+                    input_features = torch.from_numpy(input_features).cuda().float()
+                    input_features = model_layer[layer].forward(input_features)
+                    if layer == 'pool':
+                        print("Pool output: ", input_features.size())
+                        input_features = input_features.view(-1, 4 * 4 * 8)
+                    print("Output: ", input_features.size())
+                else:
+                    print("Layer: ", layer)
+                    print("Input: ", input_features.shape)
+                    input_features = input_features.cuda().float()
+                    input_features = model_layer[layer].forward(input_features)
+                    if layer == 'pool':
+                        print("Pool output: ", input_features.size())
+                        input_features = input_features.view(-1, 4 * 4 * 8)
+                    print("Output: ", input_features.size())
+
+        return grpc_service_pb2.Preds(output=json.dumps({layer:input_features.cpu().detach().numpy()}, cls=NumpyEncoder), layer=layer)
 
 def serve(port):
     options=[

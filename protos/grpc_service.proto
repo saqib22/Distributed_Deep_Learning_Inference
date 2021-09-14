@@ -89,12 +89,12 @@ message AddDropLayer {
 
 message Features{
   string inputs = 1;
-  string DAG = 2;
-  bytes model_layer = 3;
+  bytes DAG = 2;
 }
 
 message Preds{
   string output = 1;
+  string layer=2;
 }
 
 // Compilation

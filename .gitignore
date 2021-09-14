@@ -1,2 +1,4 @@
 grpc/*
 git_token.txt
+.vscode/*
+__pycache__/*

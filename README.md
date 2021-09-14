@@ -15,3 +15,11 @@ Requirements:
 ## Start Client:
 
 ``` python grpc_client.py ```
+
+
+## Under Development - Issues Remaining to Solve
+
+- Have a generalized pytorch config file that supports all types of CNNs
+- Fix the process launch and termination for each server (Multiprocessing)
+- Refactor the code and use single scripts for launching servers using a common config file
+

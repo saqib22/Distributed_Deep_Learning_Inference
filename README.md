@@ -6,7 +6,12 @@ Requirements:
 - Torch 1.3.0
 - Tensorflow-gpu 1.12.0
 
-Start Server:
+## Start Server:
 
 ``` python grpc_server.py 50051 ```
+
 ``` python grpc_server.py 50052 ```
+
+## Start Client:
+
+``` python grpc_client.py ```

@@ -1,4 +1,4 @@
 DAMA/grpc/
-DAMA/vscode/
+/.vscode/
 DAMA/__pycache__/
 git_token.txt

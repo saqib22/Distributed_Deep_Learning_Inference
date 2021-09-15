@@ -90,6 +90,8 @@ message AddDropLayer {
 message Features{
   string inputs = 1;
   bytes DAG = 2;
+  bytes pool_layer = 3;
+  bool flatten = 4;
 }
 
 message Preds{

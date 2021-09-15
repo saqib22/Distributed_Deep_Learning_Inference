@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'\n\035io.grpc.examples.grpc_serviceB\020GRPCServiceProtoP\001\242\002\003HLW',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12grpc_service.proto\x12\x0cgrpc_service\"\\\n\x03\x42id\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x11\n\tbid_value\x18\x02 \x01(\x02\x12\r\n\x05layer\x18\x03 \x01(\t\x12\x0f\n\x07\x62\x65nefit\x18\x04 \x01(\x02\x12\x0f\n\x07success\x18\x05 \x01(\x08\"X\n\rBiddingResult\x12\x11\n\tserver_id\x18\x01 \x01(\t\x12\x0b\n\x03\x41\x63k\x18\x02 \x01(\x08\x12\x13\n\x0bprice_value\x18\x03 \x01(\x02\x12\x12\n\nNack_layer\x18\x04 \x01(\t\"\x1c\n\x05Price\x12\x13\n\x0bprice_value\x18\x01 \x01(\x02\"\x1d\n\x08ServerID\x12\x11\n\tserver_id\x18\x01 \x01(\t\"!\n\x0eServerResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"g\n\nAssignment\x12\x17\n\x0flayers_assigned\x18\x01 \x01(\x08\x12\x15\n\rlayer_profits\x18\x02 \x01(\t\x12\x16\n\x0elayer_benefits\x18\x03 \x01(\t\x12\x11\n\tdevice_id\x18\x04 \x01(\t\"\x19\n\nConnection\x12\x0b\n\x03msg\x18\x01 \x01(\t\">\n\x0c\x41\x64\x64\x44ropLayer\x12\r\n\x05layer\x18\x01 \x01(\t\x12\x0e\n\x06profit\x18\x02 \x01(\x02\x12\x0f\n\x07\x62\x65nefit\x18\x03 \x01(\x02\"\'\n\x08\x46\x65\x61tures\x12\x0e\n\x06inputs\x18\x01 \x01(\t\x12\x0b\n\x03\x44\x41G\x18\x02 \x01(\x0c\"&\n\x05Preds\x12\x0e\n\x06output\x18\x01 \x01(\t\x12\r\n\x05layer\x18\x02 \x01(\t2\x82\x05\n\x04\x44\x41MA\x12>\n\nbid_server\x12\x11.grpc_service.Bid\x1a\x1b.grpc_service.BiddingResult\"\x00\x12\x43\n\x10get_server_price\x12\x18.grpc_service.Connection\x1a\x13.grpc_service.Price\"\x00\x12\x43\n\rget_server_id\x12\x18.grpc_service.Connection\x1a\x16.grpc_service.ServerID\"\x00\x12O\n\x13set_layers_assigned\x12\x18.grpc_service.Assignment\x1a\x1c.grpc_service.ServerResponse\"\x00\x12\x42\n\x11start_discounting\x12\x18.grpc_service.Connection\x1a\x11.grpc_service.Bid\"\x00\x12G\n\tack_layer\x12\x1a.grpc_service.AddDropLayer\x1a\x1c.grpc_service.ServerResponse\"\x00\x12J\n\x0creturn_layer\x12\x1a.grpc_service.AddDropLayer\x1a\x1c.grpc_service.ServerResponse\"\x00\x12H\n\nnack_layer\x12\x1a.grpc_service.AddDropLayer\x1a\x1c.grpc_service.ServerResponse\"\x00\x12<\n\x0binfer_layer\x12\x16.grpc_service.Features\x1a\x13.grpc_service.Preds\"\x00\x42\x39\n\x1dio.grpc.examples.grpc_serviceB\x10GRPCServiceProtoP\x01\xa2\x02\x03HLWb\x06proto3'
+  serialized_pb=b'\n\x12grpc_service.proto\x12\x0cgrpc_service\"\\\n\x03\x42id\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x11\n\tbid_value\x18\x02 \x01(\x02\x12\r\n\x05layer\x18\x03 \x01(\t\x12\x0f\n\x07\x62\x65nefit\x18\x04 \x01(\x02\x12\x0f\n\x07success\x18\x05 \x01(\x08\"X\n\rBiddingResult\x12\x11\n\tserver_id\x18\x01 \x01(\t\x12\x0b\n\x03\x41\x63k\x18\x02 \x01(\x08\x12\x13\n\x0bprice_value\x18\x03 \x01(\x02\x12\x12\n\nNack_layer\x18\x04 \x01(\t\"\x1c\n\x05Price\x12\x13\n\x0bprice_value\x18\x01 \x01(\x02\"\x1d\n\x08ServerID\x12\x11\n\tserver_id\x18\x01 \x01(\t\"!\n\x0eServerResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"g\n\nAssignment\x12\x17\n\x0flayers_assigned\x18\x01 \x01(\x08\x12\x15\n\rlayer_profits\x18\x02 \x01(\t\x12\x16\n\x0elayer_benefits\x18\x03 \x01(\t\x12\x11\n\tdevice_id\x18\x04 \x01(\t\"\x19\n\nConnection\x12\x0b\n\x03msg\x18\x01 \x01(\t\">\n\x0c\x41\x64\x64\x44ropLayer\x12\r\n\x05layer\x18\x01 \x01(\t\x12\x0e\n\x06profit\x18\x02 \x01(\x02\x12\x0f\n\x07\x62\x65nefit\x18\x03 \x01(\x02\"L\n\x08\x46\x65\x61tures\x12\x0e\n\x06inputs\x18\x01 \x01(\t\x12\x0b\n\x03\x44\x41G\x18\x02 \x01(\x0c\x12\x12\n\npool_layer\x18\x03 \x01(\x0c\x12\x0f\n\x07\x66latten\x18\x04 \x01(\x08\"&\n\x05Preds\x12\x0e\n\x06output\x18\x01 \x01(\t\x12\r\n\x05layer\x18\x02 \x01(\t2\x82\x05\n\x04\x44\x41MA\x12>\n\nbid_server\x12\x11.grpc_service.Bid\x1a\x1b.grpc_service.BiddingResult\"\x00\x12\x43\n\x10get_server_price\x12\x18.grpc_service.Connection\x1a\x13.grpc_service.Price\"\x00\x12\x43\n\rget_server_id\x12\x18.grpc_service.Connection\x1a\x16.grpc_service.ServerID\"\x00\x12O\n\x13set_layers_assigned\x12\x18.grpc_service.Assignment\x1a\x1c.grpc_service.ServerResponse\"\x00\x12\x42\n\x11start_discounting\x12\x18.grpc_service.Connection\x1a\x11.grpc_service.Bid\"\x00\x12G\n\tack_layer\x12\x1a.grpc_service.AddDropLayer\x1a\x1c.grpc_service.ServerResponse\"\x00\x12J\n\x0creturn_layer\x12\x1a.grpc_service.AddDropLayer\x1a\x1c.grpc_service.ServerResponse\"\x00\x12H\n\nnack_layer\x12\x1a.grpc_service.AddDropLayer\x1a\x1c.grpc_service.ServerResponse\"\x00\x12<\n\x0binfer_layer\x12\x16.grpc_service.Features\x1a\x13.grpc_service.Preds\"\x00\x42\x39\n\x1dio.grpc.examples.grpc_serviceB\x10GRPCServiceProtoP\x01\xa2\x02\x03HLWb\x06proto3'
 )
 
 
@@ -387,6 +387,20 @@ _FEATURES = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='pool_layer', full_name='grpc_service.Features.pool_layer', index=2,
+      number=3, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='flatten', full_name='grpc_service.Features.flatten', index=3,
+      number=4, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -400,7 +414,7 @@ _FEATURES = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=512,
-  serialized_end=551,
+  serialized_end=588,
 )
 
 
@@ -438,8 +452,8 @@ _PREDS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=553,
-  serialized_end=591,
+  serialized_start=590,
+  serialized_end=628,
 )
 
 DESCRIPTOR.message_types_by_name['Bid'] = _BID
@@ -534,8 +548,8 @@ _DAMA = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=594,
-  serialized_end=1236,
+  serialized_start=631,
+  serialized_end=1273,
   methods=[
   _descriptor.MethodDescriptor(
     name='bid_server',

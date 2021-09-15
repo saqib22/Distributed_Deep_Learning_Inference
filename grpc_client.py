@@ -189,7 +189,7 @@ class End_Device():
         self.model = model
         self.input_data = input_data
         for name, module in model.named_modules():
-            if name == '': continue
+            if name == '' or name =='pool': continue
             self.layers.append(name)
         #Benefit calculation -> for the time being its random
         for layer in self.layers:
@@ -206,10 +206,16 @@ class End_Device():
         #     if i == 0:
         infer_req = dict()
         input_features = self.input_data.cpu().detach().numpy()
+        pool_layer = getattr(self.model, 'pool')
+        flatten, first_linear = False, True
         for i, (layer, server) in enumerate(self.assignment_vector.items()):
             if i == 0 or server == prev_server:
                 # infer_req[layer] = {layer: pickle.dumps(getattr(self.model, layer))}
-                infer_req[layer] = {layer: getattr(self.model, layer)}
+                
+                layer_obj = getattr(self.model, layer)
+                if isinstance(layer_obj, torch.nn.modules.linear.Linear) and first_linear:
+                    flatten, first_linear = True, False
+                infer_req[layer] = {layer: layer_obj}
                 prev_server = server
                 continue
             else:
@@ -217,15 +223,20 @@ class End_Device():
                     print("\nInfer req", infer_req.keys())
                     print("Infer_req", len(infer_req))
                     print("Server: ", prev_server)
+                    
                     features = self.server_handles[prev_server].infer_layer(grpc_service_pb2.Features(
                                                                         inputs = json.dumps(input_features, cls=NumpyEncoder),
                                                                         DAG = pickle.dumps(infer_req),
+                                                                        pool_layer = pickle.dumps(pool_layer),
+                                                                        flatten=flatten
                                                                     ))
+
                     input_features = np.array(json.loads(features.output)[features.layer])
                     
                     infer_req = dict()
                     infer_req[layer] = {layer: getattr(self.model, layer)}
                     prev_server = server
+                    flatten = False
                 else:
                     print("Inference task finished successfully !!")
         
@@ -238,9 +249,12 @@ class End_Device():
                                                                 inputs = json.dumps(input_features, cls=NumpyEncoder),
                                                                 DAG = pickle.dumps(infer_req),
                                                             ))
-            final_predictions = np.array(json.loads(features.output)[features.layer])
-            print(final_predictions.shape)
-            print(final_predictions)
+            input_features = np.array(json.loads(features.output)[features.layer])
+            
+
+        predictions = np.argmax(input_features, axis=1)
+        print(predictions.shape)
+
 def run():
     # NOTE(gRPC Python Team): .close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs

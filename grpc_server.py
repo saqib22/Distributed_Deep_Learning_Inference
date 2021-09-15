@@ -148,32 +148,39 @@ class DAMA(grpc_service_pb2_grpc.DAMAServicer):
         DAG = pickle.loads(request.DAG)
         input_features = np.array(json.loads(request.inputs))
         print("Layers given for inference", DAG.keys())
-
+        first_flat = True
         with torch.no_grad():
             for layer, model_layer in DAG.items():
                 model_layer[layer].cuda()
                 
                 if type(input_features) == np.ndarray:
+                    input_features = torch.from_numpy(input_features).cuda().float()
+                    if request.flatten == True and isinstance(model_layer[layer], torch.nn.modules.linear.Linear) and first_flat:
+                        input_features = input_features.view(-1, 4 * 4 * 8)
+                        first_flat = False
                     print("Layer: ", layer)
                     print("Input: ", input_features.shape)
-                    input_features = torch.from_numpy(input_features).cuda().float()
                     input_features = model_layer[layer].forward(input_features)
-                    if layer == 'pool':
-                        print("Pool output: ", input_features.size())
-                        input_features = input_features.view(-1, 4 * 4 * 8)
+                    if isinstance(model_layer[layer], torch.nn.modules.conv.Conv2d):
+                        pool_layer = pickle.loads(request.pool_layer)
+                        input_features = pool_layer.forward(input_features)
+                    
                     print("Output: ", input_features.size())
                 else:
+                    if request.flatten == True and isinstance(model_layer[layer], torch.nn.modules.linear.Linear) and first_flat:    
+                        input_features = input_features.view(-1, 4 * 4 * 8)
+                        first_flat = False
                     print("Layer: ", layer)
                     print("Input: ", input_features.shape)
                     input_features = input_features.cuda().float()
                     input_features = model_layer[layer].forward(input_features)
-                    if layer == 'pool':
-                        print("Pool output: ", input_features.size())
-                        input_features = input_features.view(-1, 4 * 4 * 8)
+                    if isinstance(model_layer[layer], torch.nn.modules.conv.Conv2d):
+                        pool_layer = pickle.loads(request.pool_layer)
+                        input_features = pool_layer.forward(input_features)
                     print("Output: ", input_features.size())
 
+        # return grpc_service_pb2.Preds(output=json.dumps({layer:input_features.cpu().detach().numpy()}, cls=NumpyEncoder), layer=layer)
         return grpc_service_pb2.Preds(output=json.dumps({layer:input_features.cpu().detach().numpy()}, cls=NumpyEncoder), layer=layer)
-
 def serve(port):
     options=[
                 ('grpc.max_send_message_length', 1024*1024*1024),
